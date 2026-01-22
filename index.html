@@ -84,21 +84,17 @@
             border: 4px solid rgba(216, 27, 96, 0.5);
             margin-left: auto;
             margin-right: auto;
+            cursor: crosshair;
         }
 
         .game-cake {
-            font-size: clamp(40px, 10vw, 55px);
+            font-size: 50px;
             position: absolute;
             cursor: pointer;
             user-select: none;
-            animation: float 3s ease-in-out infinite;
+            transition: all 0.2s ease-out; /* Transisi lebih cepat agar responsif */
             z-index: 15;
             touch-action: manipulation;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0) scale(1); }
-            50% { transform: translateY(-10px) scale(1.1); }
         }
 
         #wish-section {
@@ -108,6 +104,7 @@
             border-radius: 20px;
             border: 2px solid rgba(255, 154, 158, 0.5);
             box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            position: relative;
         }
 
         .wish-text {
@@ -115,7 +112,34 @@
             color: #d81b60;
             line-height: 1.5;
             font-weight: 600;
-            margin-bottom: 20px;
+            display: inline;
+        }
+
+        #secret-trigger {
+            cursor: pointer;
+            font-size: 1.2em;
+            opacity: 0;
+            transition: opacity 1s ease;
+            display: inline-block;
+            vertical-align: middle;
+            margin-left: 8px;
+            animation: pulse-lock 2s infinite;
+        }
+
+        @keyframes pulse-lock {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); }
+        }
+
+        #hint-text {
+            display: block;
+            font-size: 0.7em;
+            color: #888;
+            font-style: italic;
+            margin-top: 15px;
+            opacity: 0;
+            transition: opacity 1s;
         }
 
         button {
@@ -134,9 +158,6 @@
             max-width: 250px;
         }
 
-        button:active { transform: scale(0.95); }
-
-        .btn-reveal { background: #ba68c8; }
         .btn-back { background: var(--gray-soft); margin-top: 15px; }
 
         #final-message {
@@ -162,8 +183,7 @@
 <body>
 
     <div class="falling-cake-layer" id="falling-cake-layer"></div>
-
-    <iframe style="display:none" width="0" height="0" src="https://www.youtube.com/embed/apZ-FtdD4VE?autoplay=1" frameborder="0" allow="autoplay"></iframe>
+    <div id="music-container"></div>
 
     <div class="container">
         <h1 id="typewriter-title"></h1>
@@ -171,20 +191,21 @@
 
         <div id="game-box">
             <div id="sisa-container">
-                🍰 <span id="sisa">5</span> lagi!
+                🍰 <span id="sisa">27</span> lagi!
             </div>
         </div>
 
         <div id="wish-section">
             <div id="initial-content">
                 <div id="typewriter-wish" class="wish-text"></div>
-                <button class="btn-reveal" id="btn-main-secret" style="display:none;" onclick="showSecretChoices()">Buka Pesan Tersembunyi 🔒</button>
+                <span id="secret-trigger" onclick="showSecretChoices()">🔒</span>
+                <span id="hint-text">(Coba ketuk gemboknya...)</span>
             </div>
 
             <div id="secret-area" style="display:none;">
-                <p style="font-weight: bold; font-size: 0.9em;">Coba pilih salah satu tombol rahasia ini:</p>
-                <button onclick="pilih(1)">Klik Aku</button>
-                <button onclick="pilih(2)">Atau Aku?</button>
+                <p style="font-weight: bold; font-size: 0.9em;">Ada sesuatu untukmu di sini...</p>
+                <button onclick="pilih(1)">Jangan Klik</button>
+                <button onclick="pilih(2)">Buka</button>
                 <div id="final-message"></div>
                 <button class="btn-back" onclick="backToWish()">⬅ Kembali</button>
             </div>
@@ -192,6 +213,19 @@
     </div>
 
     <script>
+        let musicStarted = false;
+        let count = 0;
+        const totalItems = 27; // Target kue diset ke 27
+        let moveTimer;
+
+        function startMusic() {
+            if (!musicStarted) {
+                const container = document.getElementById('music-container');
+                container.innerHTML = `<iframe width="0" height="0" src="https://www.youtube.com/embed/apZ-FtdD4VE?autoplay=1&loop=1&playlist=apZ-FtdD4VE" frameborder="0" allow="autoplay"></iframe>`;
+                musicStarted = true;
+            }
+        }
+
         const cakeLayer = document.getElementById('falling-cake-layer');
         const cakeEmojis = ['🍰', '🎂', '🧁', '🍩'];
 
@@ -202,7 +236,6 @@
             cake.style.left = Math.random() * 100 + "vw";
             const duration = Math.random() * 5 + 4;
             cake.style.animationDuration = duration + "s";
-            cake.style.opacity = Math.random() * 0.5 + 0.3;
             cakeLayer.appendChild(cake);
             setTimeout(() => { cake.remove(); }, duration * 1000);
         }
@@ -224,40 +257,51 @@
 
         window.onload = () => {
             typeWriter("typewriter-title", "Happy Birthday Jeni 🥳", 100, () => {
-                typeWriter("typewriter-instruksi", "Kumpulkan 5 kue untuk kejutan!", 50, () => {
+                typeWriter("typewriter-instruksi", "Tangkap 27 kue! Awas lincah!", 50, () => {
                     spawnCake();
                 });
             });
         };
 
-        let count = 0;
-        const totalItems = 5;
         const gameBox = document.getElementById('game-box');
         const sisaDisplay = document.getElementById('sisa');
         const wishSection = document.getElementById('wish-section');
 
-        function spawnCake() {
-            if (count >= totalItems) { finishGame(); return; }
-            const cake = document.createElement('div');
-            cake.className = 'game-cake';
-            cake.innerHTML = '🎂';
-            
+        function moveCake(cake) {
             const size = 60; 
             const maxX = gameBox.clientWidth - size;
             const maxY = gameBox.clientHeight - size;
-            
             const x = Math.max(10, Math.random() * maxX);
             const y = Math.max(10, Math.random() * maxY);
-            
             cake.style.left = x + 'px';
             cake.style.top = y + 'px';
+        }
+
+        function spawnCake() {
+            if (count >= totalItems) { 
+                clearTimeout(moveTimer);
+                finishGame(); 
+                return; 
+            }
+            
+            const cake = document.createElement('div');
+            cake.className = 'game-cake';
+            cake.innerHTML = '🎂';
+            moveCake(cake);
+            
+            // Kecepatan pindah diset ke 600ms (0,6 detik)
+            moveTimer = setInterval(() => moveCake(cake), 600);
             
             cake.onclick = () => {
+                startMusic();
+                clearInterval(moveTimer);
                 cake.style.transform = "scale(0)";
-                setTimeout(() => cake.remove(), 200);
-                count++;
-                sisaDisplay.innerText = totalItems - count;
-                spawnCake();
+                setTimeout(() => {
+                    cake.remove();
+                    count++;
+                    sisaDisplay.innerText = totalItems - count;
+                    spawnCake();
+                }, 150);
             };
             gameBox.appendChild(cake);
         }
@@ -267,7 +311,11 @@
             document.getElementById('typewriter-instruksi').innerHTML = ""; 
             wishSection.style.display = 'block';
             typeWriter("typewriter-wish", "Selamat ulang tahun ya! Semoga harimu penuh warna seperti pelangi, hatimu selalu hangat, dan semua impianmu tercapai tahun ini 🌈✨", 60, () => {
-                document.getElementById('btn-main-secret').style.display = 'inline-block';
+                const trigger = document.getElementById('secret-trigger');
+                trigger.style.opacity = "1";
+                setTimeout(() => {
+                    document.getElementById('hint-text').style.opacity = "1";
+                }, 3000);
             });
         }
 
@@ -279,13 +327,13 @@
         function backToWish() {
             document.getElementById('secret-area').style.display = 'none';
             document.getElementById('initial-content').style.display = 'block';
-            document.getElementById('final-message').innerText = ""; // Reset pesan rahasia
+            document.getElementById('final-message').innerText = ""; 
         }
 
         function pilih(n) {
             const out = document.getElementById('final-message');
             if(n === 1) {
-                out.innerText = "Coba tekan yang satunya! 😜";
+                out.innerText = "Sudah dibilang jangan klik! 😜 Coba yang satunya...";
                 out.style.color = "#555";
             } else {
                 out.innerText = "Umur matang, hati tenang, tapi kok masih sendiri 🤣 🤣 🤣";
