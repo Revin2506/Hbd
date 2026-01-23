@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Happy Birthday! 🎂✨</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         :root {
             --pink-soft: #ffdde1;
@@ -92,7 +93,8 @@
             position: absolute;
             cursor: pointer;
             user-select: none;
-            transition: all 0.2s ease-out; /* Transisi lebih cepat agar responsif */
+            /* Transisi disesuaikan ke 0.3s agar pas dengan 0.8s perpindahan */
+            transition: all 0.3s ease-out;
             z-index: 15;
             touch-action: manipulation;
         }
@@ -215,7 +217,7 @@
     <script>
         let musicStarted = false;
         let count = 0;
-        const totalItems = 27; // Target kue diset ke 27
+        const totalItems = 27; 
         let moveTimer;
 
         function startMusic() {
@@ -226,10 +228,9 @@
             }
         }
 
-        const cakeLayer = document.getElementById('falling-cake-layer');
-        const cakeEmojis = ['🍰', '🎂', '🧁', '🍩'];
-
         function createFallingCake() {
+            const cakeLayer = document.getElementById('falling-cake-layer');
+            const cakeEmojis = ['🍰', '🎂', '🧁', '🍩'];
             const cake = document.createElement('div');
             cake.classList.add('falling-cake');
             cake.innerText = cakeEmojis[Math.floor(Math.random() * cakeEmojis.length)];
@@ -280,7 +281,7 @@
         function spawnCake() {
             if (count >= totalItems) { 
                 clearTimeout(moveTimer);
-                finishGame(); 
+                celebrate();
                 return; 
             }
             
@@ -289,11 +290,13 @@
             cake.innerHTML = '🎂';
             moveCake(cake);
             
-            // Kecepatan pindah diset ke 600ms (0,6 detik)
-            moveTimer = setInterval(() => moveCake(cake), 600);
+            // KECEPATAN: Diubah menjadi 800ms (0,8 detik)
+            moveTimer = setInterval(() => moveCake(cake), 800);
             
             cake.onclick = () => {
                 startMusic();
+                if(navigator.vibrate) navigator.vibrate(40);
+                
                 clearInterval(moveTimer);
                 cake.style.transform = "scale(0)";
                 setTimeout(() => {
@@ -304,6 +307,28 @@
                 }, 150);
             };
             gameBox.appendChild(cake);
+        }
+
+        function celebrate() {
+            const duration = 3 * 1000;
+            const end = Date.now() + duration;
+
+            (function frame() {
+                confetti({
+                    particleCount: 5,
+                    angle: 60, spread: 55, origin: { x: 0 },
+                    colors: ['#ff9a9e', '#d81b60', '#e2d1f9']
+                });
+                confetti({
+                    particleCount: 5,
+                    angle: 120, spread: 55, origin: { x: 1 },
+                    colors: ['#ff9a9e', '#d81b60', '#e2d1f9']
+                });
+
+                if (Date.now() < end) { requestAnimationFrame(frame); }
+            }());
+
+            setTimeout(finishGame, 1000);
         }
 
         function finishGame() {
