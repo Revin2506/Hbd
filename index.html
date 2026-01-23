@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Happy Birthday! 🎂✨</title>
+    <title>Special Birthday Surprise! 🎂✨</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         :root {
@@ -33,18 +33,12 @@
 
         .falling-cake-layer {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 1; 
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 1; 
         }
 
         .falling-cake {
-            position: absolute;
-            top: -50px;
-            font-size: 24px;
+            position: absolute; top: -50px; font-size: 24px;
             animation: fall linear infinite;
         }
 
@@ -53,127 +47,75 @@
         }
 
         .container {
-            max-width: 500px;
-            width: 95%;
-            z-index: 10;
+            max-width: 500px; width: 95%; z-index: 10;
             background: rgba(255, 255, 255, 0.6);
-            padding: 20px;
-            border-radius: 25px;
+            padding: 25px; border-radius: 25px;
             border: 4px solid rgba(255, 255, 255, 0.5); 
             backdrop-filter: blur(10px);
-            margin-top: 20px;
-            box-sizing: border-box;
+            margin-top: 20px; box-sizing: border-box;
         }
 
         h1 { 
-            color: var(--deep-pink); 
-            margin: 10px 0;
+            color: var(--deep-pink); margin: 10px 0;
             text-shadow: 2px 2px white;
-            font-size: clamp(1.8em, 8vw, 2.5em);
+            font-size: clamp(1.5em, 7vw, 2.2em);
         }
 
-        /* Styling Input Awal */
+        /* Styling Form Input */
         #input-screen {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 15px;
+            display: flex; flex-direction: column; align-items: center; gap: 15px;
         }
 
-        input[type="number"] {
-            padding: 12px;
-            border-radius: 15px;
-            border: 2px solid var(--pink-dark);
-            width: 80%;
-            font-size: 1em;
-            text-align: center;
-            outline: none;
+        input {
+            padding: 12px; border-radius: 15px; border: 2px solid var(--pink-dark);
+            width: 85%; font-size: 1em; text-align: center; outline: none;
         }
         
         #game-box {
-            display: none;
-            background: rgba(255, 255, 255, 0.8);
-            border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(216, 27, 96, 0.2);
-            margin: 15px 0;
-            width: 100%;
-            aspect-ratio: 1 / 1;
-            max-height: 350px;
-            position: relative;
-            overflow: hidden;
-            border: 4px solid rgba(216, 27, 96, 0.5);
-            margin-left: auto;
-            margin-right: auto;
+            display: none; background: rgba(255, 255, 255, 0.8);
+            border-radius: 20px; margin: 15px 0; width: 100%;
+            aspect-ratio: 1 / 1; max-height: 350px; position: relative;
+            overflow: hidden; border: 4px solid rgba(216, 27, 96, 0.5);
             cursor: crosshair;
         }
 
         .game-cake {
-            font-size: 50px;
-            position: absolute;
-            cursor: pointer;
-            user-select: none;
-            transition: all 0.3s ease-out;
-            z-index: 15;
-            touch-action: manipulation;
+            font-size: 50px; position: absolute; cursor: pointer;
+            transition: all 0.3s ease-out; z-index: 15; touch-action: manipulation;
         }
 
         #wish-section {
-            display: none;
-            background: rgba(255, 255, 255, 0.9);
-            padding: 20px;
-            border-radius: 20px;
-            border: 2px solid rgba(255, 154, 158, 0.5);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
-            position: relative;
+            display: none; background: rgba(255, 255, 255, 0.9);
+            padding: 20px; border-radius: 20px; position: relative;
         }
 
         .wish-text {
-            font-size: clamp(1em, 4vw, 1.2em);
-            color: #d81b60;
-            line-height: 1.5;
-            font-weight: 600;
-            display: inline;
-        }
-
-        #secret-trigger {
-            cursor: pointer;
-            font-size: 1.2em;
-            opacity: 0;
-            transition: opacity 1s ease;
-            display: inline-block;
-            vertical-align: middle;
-            margin-left: 8px;
-            animation: pulse-lock 2s infinite;
-        }
-
-        @keyframes pulse-lock {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.3); }
-            100% { transform: scale(1); }
-        }
-
-        #hint-text {
-            display: block; font-size: 0.7em; color: #888; font-style: italic; margin-top: 15px; opacity: 0; transition: opacity 1s;
+            font-size: clamp(1em, 4vw, 1.2em); color: #d81b60;
+            line-height: 1.5; font-weight: 600;
         }
 
         #secret-btn-container {
-            height: 150px; position: relative; margin: 20px 0; border: 1px dashed rgba(216, 27, 96, 0.2); border-radius: 15px; overflow: hidden;
+            height: 120px; position: relative; margin: 20px 0;
+            border: 1px dashed rgba(216, 27, 96, 0.2); border-radius: 15px;
         }
 
         button {
-            padding: 12px 20px; border: none; border-radius: 50px; background: var(--deep-pink); color: white; font-weight: bold; cursor: pointer; transition: 0.3s; font-size: 0.9em; box-shadow: 0 5px 15px rgba(216, 27, 96, 0.3);
+            padding: 12px 25px; border: none; border-radius: 50px;
+            background: var(--deep-pink); color: white; font-weight: bold;
+            cursor: pointer; transition: 0.3s; box-shadow: 0 5px 15px rgba(216, 27, 96, 0.3);
         }
 
         #surprise-btn {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 140px; white-space: nowrap; z-index: 30; transition: all 0.2s ease;
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            white-space: nowrap; transition: all 0.2s ease;
         }
 
-        .btn-back { background: var(--gray-soft); margin-top: 15px; width: 80%; max-width: 250px; position: relative; }
-
-        #final-message { margin-top: 15px; font-weight: bold; font-size: 1.1em; min-height: 1.2em; }
+        .btn-back { background: var(--gray-soft); width: 100%; margin-top: 10px; }
 
         #sisa-container {
-            position: absolute; top: 10px; right: 15px; font-weight: bold; color: var(--deep-pink); background: rgba(255,255,255,0.7); padding: 2px 8px; border-radius: 10px; z-index: 20; display: none;
+            position: absolute; top: 10px; right: 15px; font-weight: bold;
+            color: var(--deep-pink); background: rgba(255,255,255,0.7);
+            padding: 2px 8px; border-radius: 10px; display: none;
         }
     </style>
 </head>
@@ -183,12 +125,14 @@
     <div id="music-container"></div>
 
     <div class="container">
-        <h1 id="main-title">Happy Birthday Jeni 🥳</h1>
+        <h1 id="main-title">Halo! Ada kejutan... ✨</h1>
         
         <div id="input-screen">
-            <p>Masukkan tahun kelahiranmu:</p>
-            <input type="number" id="birth-year" placeholder="Contoh: 1999" min="1900" max="2026">
-            <button onclick="startGame()">Mulai Kejutan!</button>
+            <p>Siapa namamu?</p>
+            <input type="text" id="user-name" placeholder="Nama Panggilan">
+            <p>Tahun kelahiranmu?</p>
+            <input type="number" id="birth-year" placeholder="Contoh: 1999">
+            <button onclick="startGame()">Buka Kejutan! 🎁</button>
         </div>
 
         <p id="typewriter-instruksi" style="min-height: 1.5em; font-size: 0.9em;"></p>
@@ -202,16 +146,15 @@
         <div id="wish-section">
             <div id="initial-content">
                 <div id="typewriter-wish" class="wish-text"></div>
-                <span id="secret-trigger" onclick="showSecretArea()">🔒</span>
-                <span id="hint-text">(Coba ketuk gemboknya...)</span>
+                <span id="secret-trigger" onclick="showSecretArea()" style="opacity:0; cursor:pointer; font-size:1.2em;">🔒</span>
             </div>
 
             <div id="secret-area" style="display:none;">
-                <p style="font-weight: bold; font-size: 1em;">Psst... ada sesuatu untukmu! 🤫</p>
+                <p style="font-weight: bold;">Psst... Rahasia buat kamu! 🤫</p>
                 <div id="secret-btn-container">
                     <button id="surprise-btn" onclick="handleSurpriseClick()">Jangan Diklik!</button>
                 </div>
-                <div id="final-message"></div>
+                <div id="final-message" style="margin: 15px 0; font-weight: bold;"></div>
                 <button class="btn-back" onclick="backToWish()">⬅ Kembali</button>
             </div>
         </div>
@@ -220,10 +163,11 @@
     <script>
         let musicStarted = false;
         let count = 0;
-        let totalItems = 0; 
+        let totalItems = 0;
+        let userName = "";
+        let userAge = 0;
         let moveTimer;
         let clickCount = 0;
-        let userAge = 0;
 
         function startMusic() {
             if (!musicStarted) {
@@ -234,65 +178,27 @@
         }
 
         function startGame() {
+            userName = document.getElementById('user-name').value;
             const yearInput = document.getElementById('birth-year').value;
-            const currentYear = 2026; // Tahun sesuai instruksi sistem
+            const currentYear = 2026;
 
-            if (!yearInput || yearInput > currentYear || yearInput < 1900) {
-                alert("Masukkan tahun lahir yang valid ya!");
+            if (!userName || !yearInput || yearInput > currentYear) {
+                alert("Isi nama dan tahun lahir dengan benar ya!");
                 return;
             }
 
             userAge = currentYear - yearInput;
             totalItems = userAge;
             
-            // Sembunyikan input, tampilkan game
             document.getElementById('input-screen').style.display = 'none';
+            document.getElementById('main-title').innerText = `Happy Birthday ${userName}! 🥳`;
             document.getElementById('game-box').style.display = 'block';
             document.getElementById('sisa-container').style.display = 'block';
             document.getElementById('sisa').innerText = totalItems;
 
-            typeWriter("typewriter-instruksi", `Wah, kamu sekarang berumur ${userAge} tahun! Tangkap ${userAge} kue untuk melihat kejutan!`, 50, () => {
+            typeWriter("typewriter-instruksi", `Tangkap ${userAge} kue spesial untukmu!`, 50, () => {
                 spawnCake();
             });
-        }
-
-        function createFallingCake() {
-            const cakeLayer = document.getElementById('falling-cake-layer');
-            const cakeEmojis = ['🍰', '🎂', '🧁', '🍩'];
-            const cake = document.createElement('div');
-            cake.classList.add('falling-cake');
-            cake.innerText = cakeEmojis[Math.floor(Math.random() * cakeEmojis.length)];
-            cake.style.left = Math.random() * 100 + "vw";
-            const duration = Math.random() * 5 + 4;
-            cake.style.animationDuration = duration + "s";
-            cakeLayer.appendChild(cake);
-            setTimeout(() => { cake.remove(); }, duration * 1000);
-        }
-        setInterval(createFallingCake, 800);
-
-        function typeWriter(elementId, text, speed, callback) {
-            let i = 0;
-            const element = document.getElementById(elementId);
-            element.innerHTML = "";
-            function typing() {
-                if (i < text.length) {
-                    element.innerHTML += text.charAt(i);
-                    i++;
-                    setTimeout(typing, speed);
-                } else if (callback) { callback(); }
-            }
-            typing();
-        }
-
-        function moveCake(cake) {
-            const gameBox = document.getElementById('game-box');
-            const size = 60; 
-            const maxX = gameBox.clientWidth - size;
-            const maxY = gameBox.clientHeight - size;
-            const x = Math.max(10, Math.random() * maxX);
-            const y = Math.max(10, Math.random() * maxY);
-            cake.style.left = x + 'px';
-            cake.style.top = y + 'px';
         }
 
         function spawnCake() {
@@ -305,48 +211,44 @@
             const cake = document.createElement('div');
             cake.className = 'game-cake';
             cake.innerHTML = '🎂';
-            moveCake(cake);
-            moveTimer = setInterval(() => moveCake(cake), 800); // Kecepatan 0,8 detik
+            
+            const maxX = gameBox.clientWidth - 60;
+            const maxY = gameBox.clientHeight - 60;
+            cake.style.left = Math.random() * maxX + "px";
+            cake.style.top = Math.random() * maxY + "px";
+            
+            moveTimer = setInterval(() => {
+                cake.style.left = Math.random() * maxX + "px";
+                cake.style.top = Math.random() * maxY + "px";
+            }, 800);
+
             cake.onclick = () => {
                 startMusic();
                 if(navigator.vibrate) navigator.vibrate(40);
                 clearInterval(moveTimer);
-                cake.style.transform = "scale(0)";
-                setTimeout(() => {
-                    cake.remove();
-                    count++;
-                    document.getElementById('sisa').innerText = totalItems - count;
-                    spawnCake();
-                }, 150);
+                cake.remove();
+                count++;
+                document.getElementById('sisa').innerText = totalItems - count;
+                spawnCake();
             };
             gameBox.appendChild(cake);
         }
 
         function celebrate() {
-            const duration = 3 * 1000;
-            const end = Date.now() + duration;
-            (function frame() {
-                confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#ff9a9e', '#d81b60', '#e2d1f9'] });
-                confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#ff9a9e', '#d81b60', '#e2d1f9'] });
-                if (Date.now() < end) { requestAnimationFrame(frame); }
-            }());
-            setTimeout(finishGame, 1000);
-        }
-
-        function finishGame() {
-            document.getElementById('game-box').style.display = 'none';
-            document.getElementById('typewriter-instruksi').innerHTML = ""; 
-            document.getElementById('wish-section').style.display = 'block';
-            typeWriter("typewriter-wish", `Selamat ulang tahun yang ke-${userAge}! Semoga harimu penuh warna seperti pelangi, hatimu selalu hangat, dan semua impianmu tercapai tahun ini 🌈✨`, 60, () => {
-                document.getElementById('secret-trigger').style.opacity = "1";
-                setTimeout(() => { document.getElementById('hint-text').style.opacity = "1"; }, 3000);
-            });
+            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+            setTimeout(() => {
+                document.getElementById('game-box').style.display = 'none';
+                document.getElementById('typewriter-instruksi').innerHTML = ""; 
+                document.getElementById('wish-section').style.display = 'block';
+                typeWriter("typewriter-wish", `Selamat ulang tahun yang ke-${userAge}, ${userName}! Semoga harimu penuh warna, hatimu selalu hangat, dan semua impianmu tercapai tahun ini! 🌈✨`, 60, () => {
+                    document.getElementById('secret-trigger').style.opacity = "1";
+                });
+            }, 1000);
         }
 
         function showSecretArea() {
             document.getElementById('initial-content').style.display = 'none';
             document.getElementById('secret-area').style.display = 'block';
-            clickCount = 0;
             resetSurpriseBtn();
         }
 
@@ -354,40 +256,55 @@
             clickCount++;
             const btn = document.getElementById('surprise-btn');
             const container = document.getElementById('secret-btn-container');
-            const out = document.getElementById('final-message');
             
-            if(navigator.vibrate) navigator.vibrate(50);
-
-            const messages = ["Awas kabur!", "Eits, gak kena!", "Kejar terusss!", "Dikit lagi...", "Oke, ini beneran!"];
-
             if (clickCount < 5) {
-                btn.innerText = messages[clickCount];
                 const maxX = container.clientWidth - btn.clientWidth;
                 const maxY = container.clientHeight - btn.clientHeight;
                 btn.style.transform = "none";
                 btn.style.left = Math.random() * maxX + "px";
                 btn.style.top = Math.random() * maxY + "px";
+                btn.innerText = ["Eits!", "Gak kena!", "Kejar dong!", "Dikit lagi!"][clickCount-1];
             } else {
                 btn.style.display = "none";
-                out.innerHTML = `Ciee yang penasaran... <br><span style='font-size: 1.1em;'>Udah ${userAge} tahun, tapi kok masih sendiri? 🤣✌️</span>`;
-                out.style.color = "#d81b60";
-                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+                document.getElementById('final-message').innerHTML = `Udah ${userAge} tahun, tapi ${userName} kok masih sendiri? 🤣✌️`;
+                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
             }
         }
 
         function resetSurpriseBtn() {
             const btn = document.getElementById('surprise-btn');
-            btn.style.display = "block";
-            btn.innerText = "Jangan Diklik!";
-            btn.style.top = "50%"; btn.style.left = "50%";
-            btn.style.transform = "translate(-50%, -50%)";
+            btn.style.display = "block"; btn.innerText = "Jangan Diklik!";
+            btn.style.top = "50%"; btn.style.left = "50%"; btn.style.transform = "translate(-50%, -50%)";
+            clickCount = 0;
         }
 
         function backToWish() {
             document.getElementById('secret-area').style.display = 'none';
             document.getElementById('initial-content').style.display = 'block';
-            document.getElementById('final-message').innerText = ""; 
         }
+
+        function typeWriter(elementId, text, speed, callback) {
+            let i = 0; const element = document.getElementById(elementId);
+            element.innerHTML = "";
+            function typing() {
+                if (i < text.length) { element.innerHTML += text.charAt(i); i++; setTimeout(typing, speed); }
+                else if (callback) callback();
+            }
+            typing();
+        }
+
+        function createFallingCake() {
+            const cakeLayer = document.getElementById('falling-cake-layer');
+            const cake = document.createElement('div');
+            cake.classList.add('falling-cake');
+            cake.innerText = ['🍰', '🎂', '🧁'][Math.floor(Math.random() * 3)];
+            cake.style.left = Math.random() * 100 + "vw";
+            const duration = Math.random() * 5 + 4;
+            cake.style.animationDuration = duration + "s";
+            cakeLayer.appendChild(cake);
+            setTimeout(() => cake.remove(), duration * 1000);
+        }
+        setInterval(createFallingCake, 800);
     </script>
 </body>
 </html>
