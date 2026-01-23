@@ -94,9 +94,55 @@
             line-height: 1.5; font-weight: 600;
         }
 
+        /* Gembok Rahasia Style */
+        .lock-container {
+            position: relative;
+            display: inline-block;
+            margin-top: 25px;
+            margin-bottom: 10px;
+        }
+
+        #secret-trigger {
+            cursor: pointer;
+            font-size: 2.5em;
+            opacity: 0;
+            transition: opacity 1s ease, transform 0.3s ease;
+            display: inline-block;
+            filter: drop-shadow(0 0 5px rgba(216, 27, 96, 0.3));
+        }
+
+        .pulse-animation {
+            animation: pulse-lock 1.5s infinite;
+        }
+
+        @keyframes pulse-lock {
+            0% { transform: scale(1); filter: drop-shadow(0 0 5px rgba(216, 27, 96, 0.2)); }
+            50% { transform: scale(1.2); filter: drop-shadow(0 0 15px rgba(216, 27, 96, 0.6)); }
+            100% { transform: scale(1); filter: drop-shadow(0 0 5px rgba(216, 27, 96, 0.2)); }
+        }
+
+        .lock-tooltip {
+            position: absolute;
+            top: -45px; left: 50%; transform: translateX(-50%);
+            background: var(--deep-pink); color: white;
+            padding: 6px 14px; border-radius: 12px;
+            font-size: 0.75em; white-space: nowrap;
+            opacity: 0; transition: opacity 0.5s ease;
+            pointer-events: none; font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .lock-tooltip::after {
+            content: ""; position: absolute; bottom: -6px; left: 50%;
+            transform: translateX(-50%);
+            border-left: 6px solid transparent; border-right: 6px solid transparent;
+            border-top: 6px solid var(--deep-pink);
+        }
+
         #secret-btn-container {
-            height: 120px; position: relative; margin: 20px 0;
-            border: 1px dashed rgba(216, 27, 96, 0.2); border-radius: 15px;
+            height: 140px; position: relative; margin: 20px 0;
+            border: 2px dashed rgba(216, 27, 96, 0.2); border-radius: 15px;
+            overflow: hidden;
         }
 
         button {
@@ -107,7 +153,7 @@
 
         #surprise-btn {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            white-space: nowrap; transition: all 0.2s ease;
+            white-space: nowrap; transition: all 0.2s ease; z-index: 30;
         }
 
         .btn-back { background: var(--gray-soft); width: 100%; margin-top: 10px; }
@@ -135,7 +181,7 @@
             <button onclick="startGame()">Buka Kejutan! 🎁</button>
         </div>
 
-        <p id="typewriter-instruksi" style="min-height: 1.5em; font-size: 0.9em;"></p>
+        <p id="typewriter-instruksi" style="min-height: 1.5em; font-size: 0.9em; font-weight: bold;"></p>
 
         <div id="game-box">
             <div id="sisa-container">
@@ -146,7 +192,11 @@
         <div id="wish-section">
             <div id="initial-content">
                 <div id="typewriter-wish" class="wish-text"></div>
-                <span id="secret-trigger" onclick="showSecretArea()" style="opacity:0; cursor:pointer; font-size:1.2em;">🔒</span>
+                <br>
+                <div class="lock-container">
+                    <div id="lock-msg" class="lock-tooltip">Buka kado rahasia! 🎁</div>
+                    <span id="secret-trigger" onclick="showSecretArea()">🔒</span>
+                </div>
             </div>
 
             <div id="secret-area" style="display:none;">
@@ -154,7 +204,7 @@
                 <div id="secret-btn-container">
                     <button id="surprise-btn" onclick="handleSurpriseClick()">Jangan Diklik!</button>
                 </div>
-                <div id="final-message" style="margin: 15px 0; font-weight: bold;"></div>
+                <div id="final-message" style="margin: 15px 0; font-weight: bold; color: var(--deep-pink);"></div>
                 <button class="btn-back" onclick="backToWish()">⬅ Kembali</button>
             </div>
         </div>
@@ -182,8 +232,8 @@
             const yearInput = document.getElementById('birth-year').value;
             const currentYear = 2026;
 
-            if (!userName || !yearInput || yearInput > currentYear) {
-                alert("Isi nama dan tahun lahir dengan benar ya!");
+            if (!userName || !yearInput || yearInput > currentYear || yearInput < 1900) {
+                alert("Isi nama dan tahun lahir yang valid ya!");
                 return;
             }
 
@@ -196,7 +246,7 @@
             document.getElementById('sisa-container').style.display = 'block';
             document.getElementById('sisa').innerText = totalItems;
 
-            typeWriter("typewriter-instruksi", `Tangkap ${userAge} kue spesial untukmu!`, 50, () => {
+            typeWriter("typewriter-instruksi", `Wah, sudah ${userAge} tahun! Tangkap ${userAge} kue spesial untukmu!`, 50, () => {
                 spawnCake();
             });
         }
@@ -214,13 +264,14 @@
             
             const maxX = gameBox.clientWidth - 60;
             const maxY = gameBox.clientHeight - 60;
-            cake.style.left = Math.random() * maxX + "px";
-            cake.style.top = Math.random() * maxY + "px";
             
-            moveTimer = setInterval(() => {
+            const randomPos = () => {
                 cake.style.left = Math.random() * maxX + "px";
                 cake.style.top = Math.random() * maxY + "px";
-            }, 800);
+            };
+
+            randomPos();
+            moveTimer = setInterval(randomPos, 800);
 
             cake.onclick = () => {
                 startMusic();
@@ -240,8 +291,17 @@
                 document.getElementById('game-box').style.display = 'none';
                 document.getElementById('typewriter-instruksi').innerHTML = ""; 
                 document.getElementById('wish-section').style.display = 'block';
+                
                 typeWriter("typewriter-wish", `Selamat ulang tahun yang ke-${userAge}, ${userName}! Semoga harimu penuh warna, hatimu selalu hangat, dan semua impianmu tercapai tahun ini! 🌈✨`, 60, () => {
-                    document.getElementById('secret-trigger').style.opacity = "1";
+                    const lock = document.getElementById('secret-trigger');
+                    const lockMsg = document.getElementById('lock-msg');
+                    
+                    lock.style.opacity = "1";
+                    lock.classList.add('pulse-animation');
+                    
+                    setTimeout(() => {
+                        lockMsg.style.opacity = "1";
+                    }, 800);
                 });
             }, 1000);
         }
@@ -256,8 +316,10 @@
             clickCount++;
             const btn = document.getElementById('surprise-btn');
             const container = document.getElementById('secret-btn-container');
+            const out = document.getElementById('final-message');
             
             if (clickCount < 5) {
+                if(navigator.vibrate) navigator.vibrate(30);
                 const maxX = container.clientWidth - btn.clientWidth;
                 const maxY = container.clientHeight - btn.clientHeight;
                 btn.style.transform = "none";
@@ -266,16 +328,19 @@
                 btn.innerText = ["Eits!", "Gak kena!", "Kejar dong!", "Dikit lagi!"][clickCount-1];
             } else {
                 btn.style.display = "none";
-                document.getElementById('final-message').innerHTML = `Udah ${userAge} tahun, tapi ${userName} kok masih sendiri? 🤣✌️`;
+                out.innerHTML = `Udah ${userAge} tahun, tapi ${userName} kok masih sendiri? 🤣✌️`;
                 confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
             }
         }
 
         function resetSurpriseBtn() {
             const btn = document.getElementById('surprise-btn');
-            btn.style.display = "block"; btn.innerText = "Jangan Diklik!";
-            btn.style.top = "50%"; btn.style.left = "50%"; btn.style.transform = "translate(-50%, -50%)";
+            btn.style.display = "block"; 
+            btn.innerText = "Jangan Diklik!";
+            btn.style.top = "50%"; btn.style.left = "50%"; 
+            btn.style.transform = "translate(-50%, -50%)";
             clickCount = 0;
+            document.getElementById('final-message').innerText = "";
         }
 
         function backToWish() {
@@ -297,7 +362,7 @@
             const cakeLayer = document.getElementById('falling-cake-layer');
             const cake = document.createElement('div');
             cake.classList.add('falling-cake');
-            cake.innerText = ['🍰', '🎂', '🧁'][Math.floor(Math.random() * 3)];
+            cake.innerText = ['🍰', '🎂', '🧁', '🍩'][Math.floor(Math.random() * 4)];
             cake.style.left = Math.random() * 100 + "vw";
             const duration = Math.random() * 5 + 4;
             cake.style.animationDuration = duration + "s";
