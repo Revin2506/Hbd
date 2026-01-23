@@ -93,7 +93,6 @@
             position: absolute;
             cursor: pointer;
             user-select: none;
-            /* Transisi disesuaikan ke 0.3s agar pas dengan 0.8s perpindahan */
             transition: all 0.3s ease-out;
             z-index: 15;
             touch-action: manipulation;
@@ -144,6 +143,16 @@
             transition: opacity 1s;
         }
 
+        /* Area untuk tombol rahasia agar bisa bergeser aman */
+        #secret-btn-container {
+            height: 150px;
+            position: relative;
+            margin: 20px 0;
+            border: 1px dashed rgba(216, 27, 96, 0.2);
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
         button {
             padding: 12px 20px;
             border: none;
@@ -153,14 +162,28 @@
             font-weight: bold;
             cursor: pointer;
             transition: 0.3s;
-            margin: 8px;
             font-size: 0.9em;
             box-shadow: 0 5px 15px rgba(216, 27, 96, 0.3);
-            width: 80%;
-            max-width: 250px;
         }
 
-        .btn-back { background: var(--gray-soft); margin-top: 15px; }
+        #surprise-btn {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 140px;
+            white-space: nowrap;
+            z-index: 30;
+            transition: all 0.2s ease; /* Transisi bergeser */
+        }
+
+        .btn-back { 
+            background: var(--gray-soft); 
+            margin-top: 15px; 
+            width: 80%; 
+            max-width: 250px;
+            position: relative; 
+        }
 
         #final-message {
             margin-top: 15px; 
@@ -200,14 +223,17 @@
         <div id="wish-section">
             <div id="initial-content">
                 <div id="typewriter-wish" class="wish-text"></div>
-                <span id="secret-trigger" onclick="showSecretChoices()">🔒</span>
+                <span id="secret-trigger" onclick="showSecretArea()">🔒</span>
                 <span id="hint-text">(Coba ketuk gemboknya...)</span>
             </div>
 
             <div id="secret-area" style="display:none;">
-                <p style="font-weight: bold; font-size: 0.9em;">Ada sesuatu untukmu di sini...</p>
-                <button onclick="pilih(1)">Jangan Klik</button>
-                <button onclick="pilih(2)">Buka</button>
+                <p style="font-weight: bold; font-size: 1em;">Psst... ada sesuatu untukmu! 🤫</p>
+                
+                <div id="secret-btn-container">
+                    <button id="surprise-btn" onclick="handleSurpriseClick()">Jangan Diklik!</button>
+                </div>
+
                 <div id="final-message"></div>
                 <button class="btn-back" onclick="backToWish()">⬅ Kembali</button>
             </div>
@@ -219,6 +245,7 @@
         let count = 0;
         const totalItems = 27; 
         let moveTimer;
+        let clickCount = 0;
 
         function startMusic() {
             if (!musicStarted) {
@@ -284,19 +311,14 @@
                 celebrate();
                 return; 
             }
-            
             const cake = document.createElement('div');
             cake.className = 'game-cake';
             cake.innerHTML = '🎂';
             moveCake(cake);
-            
-            // KECEPATAN: Diubah menjadi 800ms (0,8 detik)
             moveTimer = setInterval(() => moveCake(cake), 800);
-            
             cake.onclick = () => {
                 startMusic();
                 if(navigator.vibrate) navigator.vibrate(40);
-                
                 clearInterval(moveTimer);
                 cake.style.transform = "scale(0)";
                 setTimeout(() => {
@@ -312,22 +334,11 @@
         function celebrate() {
             const duration = 3 * 1000;
             const end = Date.now() + duration;
-
             (function frame() {
-                confetti({
-                    particleCount: 5,
-                    angle: 60, spread: 55, origin: { x: 0 },
-                    colors: ['#ff9a9e', '#d81b60', '#e2d1f9']
-                });
-                confetti({
-                    particleCount: 5,
-                    angle: 120, spread: 55, origin: { x: 1 },
-                    colors: ['#ff9a9e', '#d81b60', '#e2d1f9']
-                });
-
+                confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#ff9a9e', '#d81b60', '#e2d1f9'] });
+                confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#ff9a9e', '#d81b60', '#e2d1f9'] });
                 if (Date.now() < end) { requestAnimationFrame(frame); }
             }());
-
             setTimeout(finishGame, 1000);
         }
 
@@ -344,26 +355,70 @@
             });
         }
 
-        function showSecretChoices() {
+        function showSecretArea() {
             document.getElementById('initial-content').style.display = 'none';
             document.getElementById('secret-area').style.display = 'block';
+            clickCount = 0;
+            // Kembalikan posisi tombol ke tengah
+            const btn = document.getElementById('surprise-btn');
+            btn.style.top = "50%";
+            btn.style.left = "50%";
+            btn.style.transform = "translate(-50%, -50%)";
+        }
+
+        function handleSurpriseClick() {
+            clickCount++;
+            const btn = document.getElementById('surprise-btn');
+            const container = document.getElementById('secret-btn-container');
+            const out = document.getElementById('final-message');
+            
+            if(navigator.vibrate) navigator.vibrate(50);
+
+            const messages = [
+                "Awas kabur!", 
+                "Eits, gak kena!", 
+                "Kejar terusss!", 
+                "Dikit lagi...", 
+                "Oke, ini beneran!"
+            ];
+
+            if (clickCount < 5) {
+                btn.innerText = messages[clickCount];
+                
+                // Menghitung posisi acak di dalam container
+                const maxX = container.clientWidth - btn.clientWidth;
+                const maxY = container.clientHeight - btn.clientHeight;
+                
+                const newX = Math.random() * maxX;
+                const newY = Math.random() * maxY;
+                
+                // Mengubah posisi tombol (menghilangkan transform translate agar posisi absolut akurat)
+                btn.style.transform = "none";
+                btn.style.left = newX + "px";
+                btn.style.top = newY + "px";
+            } else {
+                btn.style.display = "none";
+                out.innerHTML = "Ciee yang penasaran... <br><span style='font-size: 1.1em;'>Umur udah 27, tapi kok masih sendiri? 🤣✌️</span>";
+                out.style.color = "#d81b60";
+                confetti({ 
+                    particleCount: 150, 
+                    spread: 70, 
+                    origin: { y: 0.6 },
+                    colors: ['#ff9a9e', '#d81b60', '#e2d1f9']
+                });
+            }
         }
 
         function backToWish() {
             document.getElementById('secret-area').style.display = 'none';
             document.getElementById('initial-content').style.display = 'block';
             document.getElementById('final-message').innerText = ""; 
-        }
-
-        function pilih(n) {
-            const out = document.getElementById('final-message');
-            if(n === 1) {
-                out.innerText = "Sudah dibilang jangan klik! 😜 Coba yang satunya...";
-                out.style.color = "#555";
-            } else {
-                out.innerText = "Umur matang, hati tenang, tapi kok masih sendiri 🤣 🤣 🤣";
-                out.style.color = "#d81b60";
-            }
+            const btn = document.getElementById('surprise-btn');
+            btn.style.display = "block";
+            btn.innerText = "Jangan Diklik!";
+            btn.style.top = "50%";
+            btn.style.left = "50%";
+            btn.style.transform = "translate(-50%, -50%)";
         }
     </script>
 </body>
