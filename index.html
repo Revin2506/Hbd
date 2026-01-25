@@ -212,6 +212,7 @@
 
         function startMusic() {
             const container = document.getElementById('music-container');
+            // Menambahkan iframe hanya jika belum ada
             if (container.innerHTML === "") {
                 container.innerHTML = `<iframe width="0" height="0" src="https://www.youtube.com/embed/apZ-FtdD4VE?autoplay=1&loop=1&playlist=apZ-FtdD4VE" frameborder="0" allow="autoplay"></iframe>`;
             }
@@ -227,6 +228,9 @@
                 return;
             }
 
+            // Jalankan musik segera setelah tombol ditekan
+            startMusic();
+
             userAge = currentYear - yearInput;
             totalItems = userAge;
             
@@ -236,7 +240,7 @@
             document.getElementById('sisa-container').style.display = 'block';
             document.getElementById('sisa').innerText = totalItems;
 
-            typeWriter("typewriter-instruksi", `Tangkap ${userAge} kue spesial untukmu!`, 50, () => {
+            typeWriter("typewriter-instruksi", `Wah, sudah ${userAge} tahun! Tangkap ${userAge} kue spesial untukmu!`, 50, () => {
                 spawnCake();
             });
         }
@@ -264,7 +268,7 @@
             moveTimer = setInterval(randomPos, 800);
 
             cake.onclick = () => {
-                startMusic();
+                // Musik tetap berjalan, tidak perlu dipanggil ulang di sini jika sudah di awal
                 clearInterval(moveTimer);
                 cake.remove();
                 count++;
@@ -311,11 +315,7 @@
                 btn.innerText = ["Eits!", "Gak kena!", "Kejar dong!", "Dikit lagi!"][clickCount-1];
             } else {
                 btn.style.display = "none";
-                
-                // === UBAH PESAN RAHASIA DI BAWAH INI ===
-                out.innerHTML = `Ciee ${userAge} tahun! <br> Status : Nambah umur (Checked) ✅. Status yang satunya: Masih proses loading ya? 🫣 ☕`;
-                // =======================================
-
+                out.innerHTML = `Ciee ${userAge} tahun! <br> Status : Nambah umur (Checked) ✅. <br> Status yang satunya: Masih proses loading ya? 🫣 ☕`;
                 confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
             }
         }
@@ -327,6 +327,7 @@
             btn.style.top = "50%"; btn.style.left = "50%"; 
             btn.style.transform = "translate(-50%, -50%)";
             clickCount = 0;
+            document.getElementById('final-message').innerText = "";
         }
 
         function backToWish() {
